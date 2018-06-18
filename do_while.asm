@@ -27,7 +27,7 @@
   ; How to used it:
   ;   _do
   ;     ; stuff
-  		; comparation
+  ;		  ; comparation
   ;   _while ae
 
   ; given declarations, make the comparison
@@ -40,6 +40,7 @@
   %macro _while 1
     %ifctx _do 
       j%1 %$DO                                        ; Return to the begining to start the comparison
+      %pop
     %else 
           %error  "expected `_do' or `else' before `_while'" 
     %endif 

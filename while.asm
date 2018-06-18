@@ -53,6 +53,7 @@
     %ifctx _loop                                       ; Enters if a for_loop was declared before
       jmp %$WHILE
       %$END:                                           ; Return to the begining to start the comparison
+      %pop
     %else                                              ; Enters if a for wasn't declared before
       %error  "expected `_loop' before `_end'"   ; Emit error explaining
     %endif                                             ; End if

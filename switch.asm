@@ -24,74 +24,90 @@
   pop edx
 %endmacro
 
+; This switch does not have fall through
 ; How to used it:
 ;   ; declaration
-;   _switch
+;   _switch eax
 ;     ;comparation
+
 ;     _case ae
 ;       ;do stuff
-;     _break
-;   _switch
 
-; given declarations, make the comparison
-%macro _switch 0
-  %push _switch                                          ; Put the context on stack
-  ; %$FOR:                                             ; Label used to repeat the loop
+;     _default
+;       ;do stuff
+;   _end
+
+%macro _switch 1
+  %push _switch                                                ; Put context in stack
+  %define value %1                                             ; Save the value that should be compared
+  %assign %$n 1                                                ; Assign variable to change labels
+  jmp case_ %+ %$n                                             ; Jump to first case
 %endmacro
 
-; given the result of a comparison, decides if do stuff or end for
 %macro _case 1
-  %ifctx _switch                                         ; Enters if a for was declared before
-    %repl _case                                 ; Rename the current context to for_loop (to avoid error)
-    j%-1  %$BREAK                                  ; Will jump to ending for if the comparison (argument) is false
-  %elifctx _break
-    %repl _case                                 ; Rename the current context to for_loop (to avoid error)
-    j%-1  %$BREAK
-  %else
-    %error  "expected `_switch' or `_break' before `case'"       ; Emit error explaining
-  %endif                                             ; End if
+  %ifctx _switch                                               ; Enters if a switch was declared before
+    jmp %$END                                                  ; No fall through, once inside, switch should end
+    case_ %+ %$n:                                              ; Define a variable label
+      %assign %$n %$n+1                                        ; Assing the next
+      cmp value, %1                                            ; If false, go to the next case
+      jne case_ %+ %$n                                         ; If not equal, go to next case  
+  %else                                                        ; Enters if a switch was NOT declared before
+    %error  "expected `_switch' before `case'"                 ; Emit error explaining
+  %endif                                                       ; End if context
 %endmacro
 
-%macro _break 0
-  %ifctx _case
-    %repl _break
-    %$BREAK:
-  %else
-    %error  "expected `case' before `_break'"
-  %endif
+%macro _default 0
+  %ifctx _switch                                               ; Enters if a switch was declared before
+    jmp %$END                                                  ; No fall through, once inside, switch should end
+    case_ %+ %$n:                                              ; Define a variable label
+      %assign %$n %$n+1                                        ; Assing the next
+  %else                                                        ; Enters if a switch was NOT declared before
+    %error  "expected `_switch' or `_break' before `case'"     ; Emit error explaining
+  %endif                                                       ; End if context
+%endmacro
+
+%macro _end 0
+  %ifctx _switch                                               ; Enters if a switch was declared before
+    case_ %+ %$n:                                              ; Define a variable label
+    %$END:                                                     ; Label the end of the switch
+    %pop
+  %else                                                        ; Enters if a switch was declared before
+    %error  "expected `_switch' or `_break' before `_end'"     ; Emit error explaining
+  %endif                                                       ; End if
 %endmacro
 
 section .data
-msg1 db 'Declared!',0xA,0xD
-len1 equ $ - msg1
+  msg1 db 'Entered in case1!',0xA,0xD
+  len1 equ $ - msg1
 
-msg2 db 'Compared!', 0xA,0xD
-len2 equ $- msg2
+  msg2 db 'Entered in default!', 0xA,0xD
+  len2 equ $- msg2
 
-msg3 db 'Loop!', 0xA,0xD
-len3 equ $- msg3
+  msg3 db 'Done!', 0xA,0xD
+  len3 equ $- msg3
 
-msg4 db 'Incremented!', 0xA, 0xD
-len4 equ $- msg4
+  msg4 db 'Entered in case2!',0xA,0xD
+  len4 equ $ - msg4
 
-msg5 db 'Done!', 0xA, 0xD
-len5 equ $- msg5
 
 section .text
  global _start            ;must be declared for using gcc
 
 _start:
-mov eax, 0
-mov ebx, 3
+  mov ebx, 0
+  mov ecx, 3
+  mov edx, 0
 
-_switch
-  cmp eax,ebx
-  _case ae
-    write_string msg1, len1
-  _break
-  cmp ebx,ebx
-  _case ae
-    write_string msg2, len2
-  _break
+  _switch ebx  
+    _case ecx
+      write_string msg1, len1
 
-exit
+    _case edx
+      write_string msg4, len4
+
+    _default
+      write_string msg2, len2
+  _end
+
+  write_string msg3, len3
+  exit
