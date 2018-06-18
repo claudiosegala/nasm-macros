@@ -11,13 +11,13 @@
     push ebx
     push ecx
     push edx
-  
+
     mov   eax, 4
     mov   ebx, 1
     mov   ecx, %1
     mov   edx, %2
     int   80h
-    
+
     pop eax
     pop ebx
     pop ecx
@@ -32,7 +32,7 @@
   ;  _end
 
   ; given declarations, make the comparison
-  %macro _while 0  
+  %macro _while 0
     %push _while                                          ; Put the context on stack
     %$WHILE:                                             ; Label used to repeat the loop
   %endmacro
@@ -40,15 +40,16 @@
   ; given the result of a comparison, decides if do stuff or end for
   %macro _loop 1
     %ifctx _while                                         ; Enters if a for was declared before
-      %repl  _loop                                 ; Rename the current context to for_loop (to avoid error)
-      j%-1  %$END                                  ; Will jump to ending for if the comparison (argument) is false
+      %repl  _loop
+      ; dec ebx                               ; Rename the current context to for_loop (to avoid error)
+      j%1  %$END                                  ; Will jump to ending for if the comparison (argument) is false
     %else                                              ; Enters if a for wasn't declared before
       %error  "expected `_while' before `_loop'"       ; Emit error explaining
     %endif                                             ; End if
   %endmacro
-      
+
   ; do nothing, used just to separate
-  %macro _end 0  
+  %macro _end 0
     %ifctx _loop                                       ; Enters if a for_loop was declared before
       jmp %$WHILE
       %$END:                                           ; Return to the begining to start the comparison
@@ -78,11 +79,11 @@ _start:
   	cmp eax, ebx
   	write_string msg2, len2
   _loop ae
-  	inc eax
   	write_string msg3, len3
+    inc eax
   _end
 
   write_string msg5, len5
-  
+
 
   exit
