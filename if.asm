@@ -1,32 +1,32 @@
 %macro for_loop 1 
 
     %push for_loop 
-    j%-1  %$ifnot 
-    
-%endmacro 
+    j%-1  %$ifnot
 
-%macro else 0 
+%endmacro
 
-  %ifctx if 
-        %repl   else 
-        jmp     %$ifend 
-        %$ifnot: 
-  %else 
-        %error  "expected `if' before `else'" 
-  %endif 
+%macro else 0
 
-%endmacro 
+  %ifctx if
+        %repl   else
+        jmp     %$ifend
+        %$ifnot:
+  %else
+        %error  "expected `if' before `else'"
+  %endif
 
-%macro endif 0 
+%endmacro
 
-  %ifctx if 
-        %$ifnot: 
-        %pop 
-  %elifctx      else 
-        %$ifend: 
-        %pop 
-  %else 
-        %error  "expected `if' or `else' before `endif'" 
-  %endif 
+%macro endif 0
+
+  %ifctx if
+        %$ifnot:
+        %pop
+  %elifctx      else
+        %$ifend:
+        %pop
+  %else
+        %error  "expected `if' or `else' before `endif'"
+  %endif
 
 %endmacro
