@@ -50,7 +50,7 @@
     case_ %+ %$n:                                              ; Define a variable label
       %assign %$n %$n+1                                        ; Assing the next
       cmp value, %1                                            ; If false, go to the next case
-      jne case_ %+ %$n                                         ; If not equal, go to next case  
+      jne case_ %+ %$n                                         ; If not equal, go to next case
   %else                                                        ; Enters if a switch was NOT declared before
     %error  "expected `_switch' before `case'"                 ; Emit error explaining
   %endif                                                       ; End if context
@@ -96,13 +96,13 @@ section .text
 _start:
   mov ebx, 0
   mov ecx, 3
-  mov edx, 0
+  mov edx, 1
 
-  _switch ebx  
-    _case ecx
+  _switch ebx
+    _case edx
       write_string msg1, len1
 
-    _case edx
+    _case ecx
       write_string msg4, len4
 
     _default
