@@ -1,16 +1,13 @@
-%macro for_loop 1 
-
-    %push for_loop 
-    j%-1  %$ifnot
-
+%macro if 1
+  %push if
+  j%-1  %$ifnot
 %endmacro
 
 %macro else 0
-
   %ifctx if
-        %repl   else
-        jmp     %$ifend
-        %$ifnot:
+    %repl   else
+    jmp     %$ifend
+    %$ifnot:
   %else
         %error  "expected `if' before `else'"
   %endif

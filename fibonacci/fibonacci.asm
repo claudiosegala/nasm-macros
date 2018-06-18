@@ -22,8 +22,8 @@ loop:
     xor  eax,eax        ; evita lixo de memoria em eax colocando zero
     call fibonacci_init  ; primeiro loop
     call print_int       ; printa o numero
-    mov eax, newline     
-    call print_string       
+    mov eax, newline
+    call print_string
     ret
 
 fibonacci_init:
@@ -34,7 +34,7 @@ fibonacci_init:
 fibonacci_continue:
     dec  EBX      ; ebx = ebx-1
     call fibonacci_init     ; soma = soma + fib(n-1)
-    dec  EBX      ; 
+    dec  EBX      ;
     call fibonacci_init     ; soma = soma + fib(n-2)
     add  EBX,2    ; volta o register pra continuar a operacao
     ret

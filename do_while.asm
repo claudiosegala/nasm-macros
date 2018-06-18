@@ -11,13 +11,13 @@
     push ebx
     push ecx
     push edx
-  
+
     mov   eax, 4
     mov   ebx, 1
     mov   ecx, %1
     mov   edx, %2
     int   80h
-    
+
     pop eax
     pop ebx
     pop ecx
@@ -31,19 +31,18 @@
   ;   _while ae
 
   ; given declarations, make the comparison
-  %macro _do 0  
+  %macro _do 0
     %push _do                                          ; Put the context on stack
     %$DO:                                              ; Label used to repeat the loop
   %endmacro
 
-  ; end for
   %macro _while 1
-    %ifctx _do 
-      j%1 %$DO                                        ; Return to the begining to start the comparison
-      %pop
-    %else 
-          %error  "expected `_do' or `else' before `_while'" 
-    %endif 
+    %ifctx _do ;checks if _do was declared before
+      j%1 %$DO ; jump to $DO label if first argument is false
+      %pop; remove first argument from stack
+    %else
+      %error  "expected `_do' or `else' before `_while'"
+    %endif
   %endmacro
 
 section .data
@@ -60,13 +59,11 @@ _start:
 
   mov eax, 0
   mov ebx, 3
-  
-  _do 
+
+  _do
     write_string msg3, len3
     inc eax
     cmp eax, ebx
   _while ae
-
-  write_string msg5, len5
-
+    write_string msg5, len5
   exit

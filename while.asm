@@ -39,24 +39,23 @@
 
   ; given the result of a comparison, decides if do stuff or end for
   %macro _loop 1
-    %ifctx _while                                         ; Enters if a for was declared before
-      %repl  _loop
-      ; dec ebx                               ; Rename the current context to for_loop (to avoid error)
-      j%1  %$END                                  ; Will jump to ending for if the comparison (argument) is false
-    %else                                              ; Enters if a for wasn't declared before
-      %error  "expected `_while' before `_loop'"       ; Emit error explaining
-    %endif                                             ; End if
+    %ifctx _while                                         ; Enters if a _while was declared before
+      %repl  _loop                                        ; rename context to _loop
+      j%+1  %$END                                          ; Will jump to ending for if the comparison (argument) is false
+    %else
+      %error  "expected `_while' before `_loop'"
+    %endif
   %endmacro
 
   ; do nothing, used just to separate
   %macro _end 0
     %ifctx _loop                                       ; Enters if a for_loop was declared before
-      jmp %$WHILE
-      %$END:                                           ; Return to the begining to start the comparison
+      jmp %$WHILE                                      ; jump to begining
+      %$END:                                           ; label to end program
       %pop
-    %else                                              ; Enters if a for wasn't declared before
-      %error  "expected `_loop' before `_end'"   ; Emit error explaining
-    %endif                                             ; End if
+    %else
+      %error  "expected `_loop' before `_end'"
+    %endif
   %endmacro
 
 section .data
@@ -74,7 +73,7 @@ section .text
 
 _start:
   mov eax, 0
-  mov ebx, 3
+  mov ebx, 5
 
   _while
   	cmp eax, ebx

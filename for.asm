@@ -11,13 +11,13 @@
     push ebx
     push ecx
     push edx
-  
+
     mov   eax, 4
     mov   ebx, 1
     mov   ecx, %1
     mov   edx, %2
     int   80h
-    
+
     pop eax
     pop ebx
     pop ecx
@@ -30,28 +30,27 @@
   ;     ; comparation
   ;   for_loop ae
   ;     ; do stuff
-  ;   for_inc 
+  ;   for_inc
   ;     ; inc
   ;   for_end
 
-  ; given declarations, make the comparison
-  %macro for 0  
+
+  %macro for 0
     %push for                                          ; Put the context on stack
     %$FOR:                                             ; Label used to repeat the loop
   %endmacro
 
-  ; given the result of a comparison, decides if do stuff or end for
   %macro for_loop 1
     %ifctx for                                         ; Enters if a for was declared before
       %repl   for_loop                                 ; Rename the current context to for_loop (to avoid error)
-      j%-1  %$FOR_END                                  ; Will jump to ending for if the comparison (argument) is false
+      j%+1  %$FOR_END                                  ; Will jump to ending for if the comparison (argument) is false
     %else                                              ; Enters if a for wasn't declared before
       %error  "expected `for' before `for_loop'"       ; Emit error explaining
     %endif                                             ; End if
   %endmacro
-      
+
   ; do nothing, used just to separate
-  %macro for_inc 0  
+  %macro for_inc 0
     %ifctx for_loop                                    ; Enters if a for_loop was declared before
       %repl   for_inc                                  ; Rename the current context to for_inc (to avoid error)
       jmp %$FOR                                        ; Return to the begining to start the comparison
@@ -61,16 +60,16 @@
   %endmacro
 
   ; end for
-  %macro for_end 0 
-    %ifctx for_loop 
+  %macro for_end 0
+    %ifctx for_loop
           %$FOR_END:
           %pop
     %elifctx  for_inc
           %$FOR_END:
           %pop
-    %else 
-          %error  "expected `for_inc' or `else' before `for_end'" 
-    %endif 
+    %else
+          %error  "expected `for_inc' or `else' before `for_end'"
+    %endif
   %endmacro
 
 section .data
@@ -101,8 +100,8 @@ _start:
     cmp eax, ebx
   for_loop ae
     ; do stuff
-    write_string msg3, len3
-  for_inc 
+    ; write_string msg3, len3
+  for_inc
     inc ax
     write_string msg4, len4
   for_end
