@@ -40,20 +40,20 @@
 %macro _switch 1
   %push _switch                                                ; Put context in stack
   %define value %1                                             ; Save the value that should be compared
-  %assign %$n 1                                                ; Assign variable to change labels
+  ; %assign %$n 1                                                ; Assign variable to change labels
   jmp case_ %+ %$n                                             ; Jump to first case
 %endmacro
 
 %macro _case 1
-  %ifctx _switch                                               ; Enters if a switch was declared before
-    jmp %$END                                                  ; No fall through, once inside, switch should end
-    case_ %+ %$n:                                              ; Define a variable label
-      %assign %$n %$n+1                                        ; Assing the next
-      cmp value, %1                                            ; If false, go to the next case
-      jne case_ %+ %$n                                         ; If not equal, go to next case
-  %else                                                        ; Enters if a switch was NOT declared before
-    %error  "expected `_switch' before `case'"                 ; Emit error explaining
-  %endif                                                       ; End if context
+  ; %ifctx _switch                                               ; Enters if a switch was declared before
+  jmp %$END                                                  ; No fall through, once inside, switch should end
+  case_ %+ %$n:                                              ; Define a variable label
+    %assign %$n %$n+1                                        ; Assing the next
+    cmp value, %1                                            ; If false, go to the next case
+    jne case_ %+ %$n                                         ; If not equal, go to next case
+  ; %else                                                        ; Enters if a switch was NOT declared before
+  ;   %error  "expected `_switch' before `case'"                 ; Emit error explaining
+  ; %endif                                                       ; End if context
 %endmacro
 
 %macro _default 0
@@ -105,8 +105,8 @@ _start:
     _case ecx
       write_string msg4, len4
 
-    _default
-      write_string msg2, len2
+    ; _default
+    ;   write_string msg2, len2
   _end
 
   write_string msg3, len3
